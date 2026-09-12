@@ -12,3 +12,5 @@ __pycache__/
 
 # Outputs (large/intermediate only; commit final figures explicitly if needed)
 outputs/*.csv
+outputs/*.parquet
+logs/
