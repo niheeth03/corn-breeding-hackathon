@@ -1,0 +1,14 @@
+# Large raw datasets - never commit, use sample_data/ for demos
+Simplified Hackathon Dataset V3/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+
+# Outputs (large/intermediate only; commit final figures explicitly if needed)
+outputs/*.csv
