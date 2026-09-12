@@ -94,7 +94,7 @@ def build_ranked_recommendations(df: pd.DataFrame, marker_cols: list, genomic_di
     result["predicted_upper_95pct"] = result["final_predicted_yield_advantage"] + 1.96 * rmse
 
     # Confidence tier: how much real parent history backs this family's baseline
-    from src.pedigree_model import population_level_table
+    from src.mate_selection_model import population_level_table
     train_df = df[df["YEAR"] <= train_year_max]
     pop_table = population_level_table(train_df)
     known_parents = set(pop_table["parent1"].dropna()) | set(pop_table["parent2"].dropna())

@@ -81,7 +81,16 @@ The **real results**, built the same way on the actual dataset via TAMU HPRC, ar
 - `outputs/C1_ranked_recommendations_2008.csv`, `outputs/C1_resource_allocation_2008.csv`
 - `outputs/C2_ranked_recommendations_2008.csv`, `outputs/C2_resource_allocation_2008.csv`
 
-**Scaling to the full dataset**: `hpc/` contains the SLURM job scripts and setup instructions used to run this on TAMU HPRC (Grace cluster) — necessary because the full merge and validation at ~535,000 rows / 2,911 markers per cluster exceeds what's practical on a laptop for the heavier steps (see Constraints below).
+**Scaling to the full dataset**: `hpc/` contains the SLURM job scripts and setup instructions used to run this on TAMU HPRC (Grace cluster) — necessary because the full merge and validation at ~535,000 rows / 2,911 markers per cluster exceeds what's practical on a laptop for the heavier steps (see Constraints below). The exact command used to regenerate the real output files is `notebooks/03_build_final_recommendations.py` (wrapped by `hpc/build_final_recommendations.slurm`), which loads the merged dataset, trains the model, and writes the ranked list + resource allocation for a given cluster and year.
+
+**Repository structure** (only what's actually deployed, after removing candidate models that didn't beat mate-selection):
+- `src/data_integration.py`, `src/build_master_dataset.py` — Phase 1 merge pipeline
+- `src/genomic_prediction.py` — the shared ridge/marker-effect model mate-selection is built on
+- `src/mate_selection_model.py` — the winning cross-family model (mid-parent GEBV)
+- `src/final_recommendation.py` — combines the above into the deployed line-level ranking + resource allocation
+- `src/baselines.py`, `src/validation.py` — required baselines and all cross-validation schemes
+- `src/synthetic_data.py`, `run_pipeline.py` — judge mode
+- Model B (empirical pedigree averaging), the relatedness-weighted model, the GBLUP-kernel reformulation, and the environment/heat-stress extension were all built, honestly validated, and found not to beat mate-selection — their results are reported in full above, but the code was removed to keep the deployed pipeline to exactly what's actually used.
 
 ## 6. Commercial Recommendations
 
