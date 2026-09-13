@@ -79,27 +79,28 @@ plt.close(fig)
 
 
 # ============================================================
-# FIGURE 2: Model comparison -- top-20% recovery, real 2008 test
+# FIGURE 2: Our one model, two views -- family-level and line-level
 # ============================================================
-fig, ax = plt.subplots(figsize=(9, 5.5), dpi=200)
-models = ["Model A\n(plain markers)", "Mate-selection\n(family-level)", "Final deployed\n(line-level)"]
-c1_rec = [24, 40, 29.5]
-c2_rec = [27, 28, 26.4]
+fig, ax = plt.subplots(figsize=(8, 5.5), dpi=200)
+models = ["Family-level baseline\n(mid-parent GEBV)", "Final output\n(individual line ranking)"]
+c1_rec = [40, 29.5]
+c2_rec = [28, 26.4]
 x = np.arange(len(models))
 w = 0.32
 b1 = ax.bar(x - w/2, c1_rec, width=w, color=BLUE, label="Cluster 1", zorder=3)
 b2 = ax.bar(x + w/2, c2_rec, width=w, color=ORANGE, label="Cluster 2", zorder=3)
 ax.axhline(20, color=INK_MUTED, linewidth=1.4, linestyle=(0, (4, 3)), zorder=2)
-ax.text(2.5, 20.6, "chance = 20%", fontsize=9, color=INK_MUTED, ha="right")
+ax.text(1.48, 20.6, "chance = 20%", fontsize=9, color=INK_MUTED, ha="right")
 for bars in (b1, b2):
     for bar in bars:
         h = bar.get_height()
         ax.annotate(f"{h:.0f}%", (bar.get_x() + bar.get_width()/2, h),
                     xytext=(0, 4), textcoords="offset points", ha="center", fontsize=9.5)
 ax.set_xticks(x); ax.set_xticklabels(models, fontsize=10)
+ax.set_xlim(-0.55, 1.55)
 ax.set_ylabel("Top-20% recovery (real 2008 holdout)")
 ax.set_ylim(0, 46)
-ax.set_title("Every deployed model beats random selection on the real 2008 test", fontsize=13, fontweight="bold", pad=14, loc="left")
+ax.set_title("Our model beats random selection at both stages, on real 2008 data", fontsize=13, fontweight="bold", pad=14, loc="left")
 style_ax(ax)
 ax.legend(frameon=False, loc="upper right", fontsize=10)
 fig.tight_layout()
