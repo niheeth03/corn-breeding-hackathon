@@ -98,6 +98,13 @@ The **real results**, built the same way on the actual dataset via TAMU HPRC, ar
 - **Use confidence tiers to manage risk**: prioritize "High" and "Medium" confidence lines when the budget is especially tight; treat "Low" confidence advancements (novel, undocumented parents) as calculated bets on genetic diversity, not safe favorites.
 - **Two-tier deployment for the season**: use the mate-selection model for the initial go/no-go call on brand-new families (this document's core result), then switch to the within-population model (0.6+ correlation) to refine which specific individuals to keep advancing *within* a family once its first plots report back.
 
+### Resource Efficiency (tested, not estimated)
+
+- **Merge pipeline**: ~4 minutes per cluster to process the full dataset (534,845 / 535,340 rows, 2,911 markers), with memory bounded to ~3GB throughout — the pipeline streams one population at a time rather than materializing the ~13GB flattened equivalent, so it scales without needing bigger hardware as the dataset grows.
+- **Final ranking generation**: seconds to about a minute to score every genotyped 2008 candidate (7,432 / 8,536 lines) and produce the ranked, diversity-capped recommendation — cheap enough to re-run on demand as new data comes in, not a batch job you schedule overnight.
+- **Judge-mode demo**: the entire pipeline — merge, train, predict, rank, allocate — runs in under a minute on a laptop CPU, no GPU required, no external dependencies beyond `requirements.txt`.
+- **A real operational bottleneck we hit and fixed**: at full scale, uncontrolled multi-threaded BLAS usage caused an out-of-memory crash during model fitting; fixing it (explicitly capping thread count to match allocated CPUs) cut peak memory without changing a single result. This is the kind of deployment-readiness issue that only surfaces under real load, not in a notebook run once on sample data — worth noting since it reflects actual production-hardening, not just a working prototype.
+
 ## 7. Constraints and Limitations
 
 - **Model failure mode, precisely characterized**: plain marker-based prediction fails (or actively misleads) for a family with zero related training examples — this is why the final model leans on parent-level GCA rather than pooled markers alone for the between-family component.
