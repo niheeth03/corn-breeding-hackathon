@@ -177,35 +177,41 @@ plt.close(fig)
 print("Figure 4 done.")
 
 # ============================================================
-# FIGURE 5: Top recommended lines with uncertainty (Cluster 1)
+# FIGURE 5: Top recommended lines with uncertainty (both clusters)
 # ============================================================
-alloc = pd.read_csv("outputs/C1_resource_allocation_2008.csv")
-top = alloc.sort_values("final_predicted_yield_advantage", ascending=False).head(15).iloc[::-1].reset_index(drop=True)
-
-tier_color = {"High": AQUA, "Medium": YELLOW, "Low": RED}
-colors = top["confidence_tier"].map(tier_color)
-
-fig, ax = plt.subplots(figsize=(9, 7), dpi=200)
-y = np.arange(len(top))
-xerr = np.vstack([
-    top["final_predicted_yield_advantage"] - top["predicted_lower_68pct"],
-    top["predicted_upper_68pct"] - top["final_predicted_yield_advantage"],
-])
-ax.errorbar(top["final_predicted_yield_advantage"], y, xerr=xerr, fmt="none", ecolor=INK_MUTED, elinewidth=1.6, capsize=3, zorder=2)
-ax.scatter(top["final_predicted_yield_advantage"], y, s=90, color=colors, zorder=3, edgecolors=SURFACE, linewidths=1)
-ax.set_yticks(y)
-ax.set_yticklabels(top["LINE_UNIQUE_ID"], fontsize=9.5)
-ax.axvline(0, color=BASELINE, linewidth=1)
-ax.set_xlabel("Predicted yield advantage (with 68% confidence interval)")
-ax.set_title("Top 15 recommended lines to advance -- Cluster 1", fontsize=13, fontweight="bold", loc="left", pad=14)
-style_ax(ax)
-ax.grid(axis="x", zorder=0)
-ax.grid(axis="y", visible=False)
-
 from matplotlib.lines import Line2D
-handles = [Line2D([0], [0], marker="o", color="none", markerfacecolor=c, markersize=9, label=lbl) for lbl, c in tier_color.items()]
-ax.legend(handles=handles, title="Confidence", frameon=False, loc="lower right", fontsize=10)
-fig.tight_layout()
-fig.savefig(f"{OUT}/5_top_picks_uncertainty.png", facecolor=SURFACE)
-plt.close(fig)
-print("Figure 5 done.")
+
+def make_top_picks_figure(cluster, fig_num):
+    alloc = pd.read_csv(f"outputs/C{cluster}_resource_allocation_2008.csv")
+    top = alloc.sort_values("final_predicted_yield_advantage", ascending=False).head(15).iloc[::-1].reset_index(drop=True)
+
+    tier_color = {"High": AQUA, "Medium": YELLOW, "Low": RED}
+    colors = top["confidence_tier"].map(tier_color)
+
+    fig, ax = plt.subplots(figsize=(9, 7), dpi=200)
+    y = np.arange(len(top))
+    xerr = np.vstack([
+        top["final_predicted_yield_advantage"] - top["predicted_lower_68pct"],
+        top["predicted_upper_68pct"] - top["final_predicted_yield_advantage"],
+    ])
+    ax.errorbar(top["final_predicted_yield_advantage"], y, xerr=xerr, fmt="none", ecolor=INK_MUTED, elinewidth=1.6, capsize=3, zorder=2)
+    ax.scatter(top["final_predicted_yield_advantage"], y, s=90, color=colors, zorder=3, edgecolors=SURFACE, linewidths=1)
+    ax.set_yticks(y)
+    ax.set_yticklabels(top["LINE_UNIQUE_ID"], fontsize=9.5)
+    ax.axvline(0, color=BASELINE, linewidth=1)
+    ax.set_xlabel("Predicted yield advantage (with 68% confidence interval)")
+    ax.set_title(f"Top 15 recommended lines to advance -- Cluster {cluster}", fontsize=13, fontweight="bold", loc="left", pad=14)
+    style_ax(ax)
+    ax.grid(axis="x", zorder=0)
+    ax.grid(axis="y", visible=False)
+
+    handles = [Line2D([0], [0], marker="o", color="none", markerfacecolor=c, markersize=9, label=lbl) for lbl, c in tier_color.items()]
+    ax.legend(handles=handles, title="Confidence", frameon=False, loc="lower right", fontsize=10)
+    fig.tight_layout()
+    fig.savefig(f"{OUT}/{fig_num}_top_picks_uncertainty_c{cluster}.png", facecolor=SURFACE)
+    plt.close(fig)
+    print(f"Figure {fig_num} (Cluster {cluster}) done.")
+
+
+make_top_picks_figure(1, 5)
+make_top_picks_figure(2, 6)
